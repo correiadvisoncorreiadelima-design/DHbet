@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DHBet Demo 🎰</title>
+
+<meta name="theme-color" content="#000000">
+<link rel="manifest" href="data:application/json,{
+  &quot;name&quot;:&quot;DHBet Demo&quot;,
+  &quot;short_name&quot;:&quot;DHBet&quot;,
+  &quot;display&quot;:&quot;standalone&quot;,
+  &quot;background_color&quot;:&quot;#000000&quot;,
+  &quot;theme_color&quot;:&quot;#000000&quot;
+}">
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: radial-gradient(circle at top, #1a1a1a, #000);
+    color: gold;
+}
+
+header {
+    text-align: center;
+    padding: 15px;
+    border-bottom: 2px solid gold;
+    box-shadow: 0 0 10px gold;
+}
+
+.screen { display: none; padding: 20px; }
+.active { display: block; }
+
+.card {
+    background: #111;
+    border: 1px solid gold;
+    border-radius: 14px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 0 12px rgba(255,215,0,0.3);
+}
+
+button {
+    background: linear-gradient(45deg, gold, orange);
+    border: none;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    color: #000;
+    margin: 5px;
+}
+
+input {
+    width: 90%;
+    padding: 10px;
+    margin: 6px;
+    border-radius: 6px;
+    border: none;
+}
+
+.menu {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: #111;
+    display: flex;
+    justify-content: space-around;
+    border-top: 2px solid gold;
+}
+
+.menu button {
+    background: none;
+    color: gold;
+    font-size: 13px;
+}
+
+.slot {
+    font-size: 40px;
+    margin: 15px 0;
+}
+
+.lock { opacity: 0.4; }
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🎰 DHBet Demo</h1>
+    <p>Saldo: R$ <span id="saldo">0</span></p>
+</header>
+
+<!-- LOGIN -->
+<div id="login" class="screen active">
+    <div class="card">
+        <h2>🔐 Login Demo</h2>
+        <input placeholder="Usuário">
+        <input type="password" placeholder="Senha">
+        <button onclick="abrir('home')">Entrar</button>
+        <p onclick="abrir('cadastro')" style="cursor:pointer;">Criar conta</p>
+    </div>
+</div>
+
+<!-- CADASTRO -->
+<div id="cadastro" class="screen">
+    <div class="card">
+        <h2>📝 Cadastro Demo</h2>
+        <input placeholder="Usuário">
+        <input placeholder="Email">
+        <input type="password" placeholder="Senha">
+        <button onclick="abrir('home')">Cadastrar</button>
+    </div>
+</div>
+
+<!-- HOME -->
+<div id="home" class="screen">
+    <div class="card">
+        <h2>🎮 Jogos</h2>
+        <button onclick="abrir('slot777')">🎰 Slot 777</button>
+        <button onclick="abrir('frutas')">🍒 Slot Frutas</button>
+        <button onclick="abrir('dados')">🎲 Dados</button>
+        <button onclick="abrir('vip')">💎 Área VIP</button>
+    </div>
+</div>
+
+<!-- SLOT 777 -->
+<div id="slot777" class="screen">
+    <div class="card">
+        <h2>🎰 Slot 777</h2>
+        <div id="s777" class="slot">7️⃣ 7️⃣ 7️⃣</div>
+        <button onclick="girar('s777',600)">Girar</button>
+    </div>
+</div>
+
+<!-- FRUTAS -->
+<div id="frutas" class="screen">
+    <div class="card">
+        <h2>🍒 Slot Frutas</h2>
+        <div id="sfruta" class="slot">🍒 🍋 🍉</div>
+        <button onclick="girar('sfruta',500)">Girar</button>
+    </div>
+</div>
+
+<!-- DADOS -->
+<div id="dados" class="screen">
+    <div class="card">
+        <h2>🎲 Dados da Sorte</h2>
+        <button onclick="ganhar(400)">Jogar</button>
+    </div>
+</div>
+
+<!-- VIP -->
+<div id="vip" class="screen">
+    <div class="card">
+        <h2>💎 Área VIP Demo</h2>
+        <div id="vipContent"></div>
+    </div>
+</div>
+
+<!-- TERMOS -->
+<div id="termos" class="screen">
+    <div class="card">
+        <h2>📜 Termos & Aviso Legal</h2>
+        <p>Este site é apenas uma simulação DEMO.</p>
+        <p>Não envolve dinheiro real, apostas reais ou prêmios.</p>
+        <p>Uso exclusivo para entretenimento e demonstração.</p>
+    </div>
+</div>
+
+<!-- MENU -->
+<div class="menu">
+    <button onclick="abrir('home')">🏠</button>
+    <button onclick="abrir('vip')">💎</button>
+    <button onclick="abrir('termos')">📜</button>
+</div>
+
+<script>
+let saldo = localStorage.getItem("saldo") || 1000;
+let dia = localStorage.getItem("dia");
+let hoje = new Date().toLocaleDateString();
+
+if (dia !== hoje) {
+    saldo = 1000;
+    localStorage.setItem("dia", hoje);
+}
+
+document.getElementById("saldo").innerText = saldo;
+localStorage.setItem("saldo", saldo);
+
+function abrir(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if (id === 'vip') vip();
+}
+
+function girar(display, max) {
+    const itens = ["7️⃣","🍒","🍋","🍉","⭐","💎"];
+    let i = 10;
+    let loop = setInterval(()=>{
+        document.getElementById(display).innerText =
+        itens[Math.random()*itens.length|0]+" "+
+        itens[Math.random()*itens.length|0]+" "+
+        itens[Math.random()*itens.length|0];
+        i--;
+        if(i<=0){
+            clearInterval(loop);
+            ganhar(max);
+        }
+    },100);
+}
+
+function ganhar(max){
+    let g = Math.floor(Math.random()*max);
+    saldo = parseInt(saldo) + g;
+    localStorage.setItem("saldo", saldo);
+    document.getElementById("saldo").innerText = saldo;
+    alert("🎉 Você ganhou R$ "+g+" (DEMO)");
+}
+
+function vip(){
+    let ok = saldo >= 3000;
+    document.getElementById("vipContent").innerHTML = ok ?
+    `<p>✅ VIP ATIVO</p>
+     <button onclick="ganhar(1200)">💎 Slot VIP</button>
+     <button onclick="ganhar(1500)">👑 Mega VIP</button>` :
+    `<p class="lock">🔒 VIP BLOQUEADO</p>
+     <p>Tenha R$3000 demo para liberar</p>`;
+}
+</script>
+
+</body>
+</html>
